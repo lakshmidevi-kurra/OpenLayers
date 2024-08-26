@@ -1,0 +1,93 @@
+#map{
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+}
+
+.custom-attribution{
+    bottom: 0;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    z-index: 1000;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+
+}
+/* line ui */
+
+.linedraw {
+   
+        top: 150px;
+        left: 60px;
+        width: 30px; 
+        height: 30px;
+        border: 2px solid #ece8e8; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        position: absolute;
+        font-size: 24px; 
+        color: #bab7bc;
+        z-index: 1000;
+        cursor: 'pointer';
+
+}
+.polygon-tool{
+    top: 200px;
+    width: 30px; 
+    height: 30px;
+    border: 2px solid #ece8e8; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    position: absolute;
+    font-size: 24px; 
+    color: #bab7bc;
+    z-index: 1000;
+    cursor: 'pointer';
+
+}
+
+.card{
+    position: absolute;
+    height: 250px;
+    width: 250px;
+    top: 150px;
+    right: 50px;
+    background-color: whitesmoke;
+    padding: auto;
+    padding-right: 1px;
+}
+
+.card-title{
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight:500 ;
+    color: rgb(175, 16, 228);
+    background-color: rgb(165, 223, 200);
+    align-content: center;
+    font-size: 25px;
+
+}
+
+.line-form{
+    position: absolute;
+    background-color: #ece8e8;
+    z-index: 1000;
+}
+
+.card-body label{
+    padding: 3px;
+    padding-top: 0px;
+    background-color:rgb(74, 175, 175);
+    
+}
+
+.card-line{
+    top: 200px;
+    height: auto;
+    width: 50px;
+    
+}
