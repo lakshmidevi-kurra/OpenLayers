@@ -1,6 +1,7 @@
 import 'ol/ol.css'
 import React from 'react'
-import Logoicon from '../images/company-logo.jpg'
+import Logoicon from '../src/../../images/company-logo.jpg'
+import './Navbar.css'
 export default function NavBar() {
     return (
         <>

@@ -8,18 +8,30 @@ import VectorSource from 'ol/source/Vector';
 import './style.css';
 
 // Polylines draw
-import lineIcon from '../images/line.png';
+import lineIcon from '../images/draw.png';
 import { Feature } from 'ol';
 import { LineString } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
 
 // GeoJson Data 
-import geoJsonicon from '../images/geojson.png'
+import geoJsonicon from '../images/database.png'
 import GeoJSON from 'ol/format/GeoJSON';
 
 import Polygon from 'ol/geom/Polygon';
-import polygonIcon from '../images/polygon.png'
-import NavBar from './NavBar';
+import polygonIcon from '../images/polyline.png'
+
+
+//Point Tool
+import PointIcon from '../images/point.png';
+
+//Circle Tool 
+import CircleIcon from '../images/circle.png'
+
+//Navigation icon
+import NavgationIcon from '../images/navigation.png'
+
+
+import NavBar from './NavBar/NavBar';
 export default function Map12() {
     const vectorSource = useRef(new VectorSource());
     const mapRef = useRef(null);
@@ -46,7 +58,13 @@ export default function Map12() {
     const [numSides, setNumSides] = useState(null);
     const [polygoncoordinates, setpolygonCoordinates] = useState([]);
 
-
+    // Point Variable
+        const[showPointForm, setShowPointForm]=useState(false);
+        const[lat, setLat]=useState(null);
+        const[lon, setLan]=useState(null);
+        
+    // Circle Variable
+    const[showCircleForm, setCircleForm]=useState(false);
 
     // Map creation
     useEffect(() => {
@@ -80,6 +98,8 @@ export default function Map12() {
         setShowPoliLineForm(true);
         setShowGeojson(false);
         setShowPolygonForm(false)
+        setShowPointForm(false);
+        setCircleForm(false);
     };
 
     const handlePointsSubmit = (e) => {
@@ -131,6 +151,8 @@ export default function Map12() {
         setShowGeojson(true);
         setShowPoliLineForm(false);
         setShowPolygonForm(false);
+        setShowPointForm(false);
+        setCircleForm(false);
     };
     const handleFileUpload = (event) => {
         console.log("Event target:", event.target);
@@ -172,6 +194,8 @@ export default function Map12() {
         setShowPolygonForm(true);
         setShowGeojson(false);
         setShowPoliLineForm(false);
+        setShowPointForm(false);
+        setCircleForm(false);
 
     };
     const handleNumSidesChange = (event) => {
@@ -224,6 +248,23 @@ export default function Map12() {
     };
     // polygon end 
 
+    //Point section start
+    const handlePointDrawClick=()=>{
+        setShowPoliLineForm(false);
+        setShowGeojson(false);
+        setShowPolygonForm(false)
+        setShowPointForm(true);
+        setCircleForm(false);  
+    }
+
+    const handleCircleDrawClick=()=>{
+        setCircleForm(true);
+        setShowPoliLineForm(false);
+        setShowGeojson(false);
+        setShowPolygonForm(false)
+        setShowPointForm(false);
+    }
+
     return (
         <>
         <NavBar/>
@@ -233,26 +274,53 @@ export default function Map12() {
             <div
                 className="linedraw"
                 onClick={handlePoliLineDrawClick}
-                style={{ position: 'absolute', bottom: '10px', left: '10px', zIndex: 1000 }}
+                style={{ position: 'absolute', bottom: '10px', left: '12px', zIndex: 1000 }}
             >
-                <img src={lineIcon} alt="Line" style={{ height: '40px', width: '40px' }} />
+                <img src={lineIcon} alt="Line" style={{ height: '40px', width: '40px', backgroundColor:'white' }} />
             </div>
 
             {/* Geo Json Data section */}
             <div className='geojson-data'
-                onClick={handleGeojson} style={{ position: 'absolute', bottom: '10px', left: '10px', zIndex: 1000 }}>
-                <img src={geoJsonicon} alt="geoJson" style={{ height: '40px', width: '40px' }}></img>
+                onClick={handleGeojson} style={{ position: 'absolute', bottom: '10px', left: '12px', zIndex: 1000 }}>
+                <img src={geoJsonicon} alt="geoJson" style={{ height: '40px', width: '40px', backgroundColor:'white' }}></img>
             </div>
 
             {/* Polygon Draw section */}
             <div
                 className="polygon-tool"
                 onClick={handlePolygonDrawClick}
-                style={{ position: 'absolute', bottom: '10px', left: '10px', zIndex: 1000 }}
+                style={{ position: 'absolute', bottom: '10px', left: '12px', zIndex: 1000 }}
             >
-                <img src={polygonIcon} alt="Polygon" style={{ height: '40px', width: '40px' }} />
+                <img src={polygonIcon} alt="Polygon"  style={{height:'40px', width:'40px', backgroundColor:'white'}} />
             </div>
 
+            {/* Circle Tool */}
+            <div className='circle-Tool'
+            onSubmit={handleCircleDrawClick}
+            style={{ position: 'absolute', top: '350px', left: '12px', zIndex: 1000 }}>
+            <img src={CircleIcon} alt='Circle' style={{ height:'40px', width:'40px', backgroundColor:'white'}}/>
+            </div>
+
+            <div className='point-tool' 
+            onClick={handlePointDrawClick} 
+            style={{ position: 'absolute', bottom: '300px', left: '10px', zIndex: 1000 }}>
+                <img src={PointIcon} alt='point' style={{ height:'40px', width:'40px', backgroundColor:'white'}}/>
+
+            </div>
+
+            {/* Navigation */}
+            <div className='navigation-tool' 
+            style={{position:'absolute', top:'50px', right:'10px', zIndex:1000}}
+            >
+                <img src={NavgationIcon} alt="navgation " style={{ height:'40px', width:'40px'}} />
+
+            </div>
+            
+        {/*
+        
+            Tool Section Start
+        
+        */}
 
             {/* Polylines draw tool */}
             {showPolyLineForm && (
