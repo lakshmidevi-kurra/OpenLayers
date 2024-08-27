@@ -6,8 +6,10 @@ import { OSM } from 'ol/source';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import './Map12.css'
+
+import homeIcon from '../images/home .png'
 // Polylines draw
-import lineIcon from '../images/draw.png';
+import lineIcon from '../images/drawLine.png';
 import { Feature } from 'ol';
 import { LineString } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
@@ -16,23 +18,20 @@ import { fromLonLat } from 'ol/proj';
 import geoJsonicon from '../images/database.png'
 import GeoJSON from 'ol/format/GeoJSON';
 
+//Polygon Tool
 import Polygon from 'ol/geom/Polygon';
-import polygonIcon from '../images/polyline.png'
-
+import polygonIcon from '../images/polygon.png'
 
 //Point Tool
 import PointIcon from '../images/point.png';
 import { Point } from 'ol/geom';
 import { Style, Icon } from 'ol/style';
 
-
 //Circle Tool 
 import CircleIcon from '../images/circle.png'
+import { Fill, Stroke } from 'ol/style';
+import { Circle as CircleGeom, } from 'ol/geom';
 
-//Navigation icon
-
-
-import NavBar from './NavBar/NavBar';
 export default function Map12() {
     const vectorSource = useRef(new VectorSource());
     const mapRef = useRef(null);
@@ -41,11 +40,11 @@ export default function Map12() {
     const viewRef = useRef(null);
 
     // State for controlling visibility of forms
-    const [showPolyLineForm, setShowPoliLineForm] = useState(false);
 
     // Polyline Draw Tool variables
     const [coordinates, setCoordinates] = useState([]);
     const [numPoints, setNumPoints] = useState(0);
+    const [showPolyLineForm, setShowPoliLineForm] = useState(false);
 
     // GeoJson variable
     const [showGeojson, setShowGeojson] = useState(0);
@@ -60,11 +59,10 @@ export default function Map12() {
     const [showPointForm, setShowPointForm] = useState(false);
     const [pointCoordinates, setPointCoordinates] = useState({ lat: '', lon: '' });
 
-    
-
     // Circle Variable
     const [showCircleForm, setCircleForm] = useState(false);
-
+    const [circleCoordinates, setCircleCoordinates] = useState({ lat: '', lon: '' });
+    const [radius, setRadius] = useState('');
 
     // Map creation
     useEffect(() => {
@@ -260,8 +258,7 @@ export default function Map12() {
         setShowPointForm(true);
         setCircleForm(false);
     };
-    const handleDrawPoint = (e) => 
-        {
+    const handleDrawPoint = (e) => {
         e.preventDefault();
 
         // Validate inputs
@@ -300,19 +297,71 @@ export default function Map12() {
         setShowPolygonForm(false)
         setShowPointForm(false);
     }
+    const handleDrawCircle = (e) => {
+        e.preventDefault();
 
-    /*  Navigation- Rotation  Handle */
-   
+        // Validate inputs
+        if (!circleCoordinates.lat || !circleCoordinates.lon || !radius) {
+            alert('Please enter valid latitude, longitude, and radius.');
+            return;
+        }
+
+        const center = fromLonLat([parseFloat(circleCoordinates.lon), parseFloat(circleCoordinates.lat)]);
+        const radiusin = parseFloat(radius) * 1000
+        const circleGeom = new CircleGeom(center, radiusin);
+        const circleFeature = new Feature(circleGeom);
+
+        // Optional: Set a custom style for the circle
+        circleFeature.setStyle(
+            new Style({
+                stroke: new Stroke({
+                    color: 'blue',
+                    width: 5,
+                }),
+                fill: new Fill({
+                    color: 'rgba(0, 0, 255, 0.1)',
+                }),
+            })
+        );
+
+        vectorSource.current.clear();  // Clear previous features if needed
+        vectorSource.current.addFeature(circleFeature);
+
+        // Adjust map view to center on the circle
+        map.getView().animate({ center: center, zoom: 10, duration: 1000 });
+    };
+
+    const handleHomeClick = () => {
+        // Show the point form and hide others
+        setShowPoliLineForm(false);
+        setShowGeojson(false);
+        setShowPolygonForm(false);
+        setShowPointForm(false);
+        setCircleForm(false);
+
+    };
+
+
+
     return (
         <>
-            <NavBar />
             <div id="map" ref={mapRef} style={{ width: '100%', height: '100vh', position: 'absolute' }}></div>
+
+            {/* Home Section */}
+            <div
+                className="home"
+                onClick={handleHomeClick}
+                style={{ position: 'absolute', top:'150px', left: '15px', zIndex: 1000 }}
+            >
+                <img src={homeIcon} alt="Line" style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
+            </div>
+
 
             {/* Polylines draw Section */}
             <div
                 className="linedraw"
                 onClick={handlePoliLineDrawClick}
-                style={{ position: 'absolute', bottom: '10px', left: '12px', zIndex: 1000 }}
+                style={{ position: 'absolute',  top:' 200px' , left: '15px', zIndex: 1000 }}
             >
                 <img src={lineIcon} alt="Line" style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
             </div>
@@ -320,38 +369,35 @@ export default function Map12() {
             {/* Polygon Draw section */}
             <div
                 className="polygon-tool"
-                onClick={handlePolygonDrawClick}
-                style={{ position: 'absolute', top: '195px', left: '9px', zIndex: 1000 }}
-            >
+                onClick={handlePolygonDrawClick}  style={{ position: 'absolute', top: '250px', left: '15px', zIndex: 1000 }}>
                 <img src={polygonIcon} alt="Polygon" style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
             </div>
 
             {/* Geo Json Data section */}
             <div className='geojson-data'
-                onClick={handleGeojson} style={{ position: 'absolute', bottom: '10px', left: '12px', zIndex: 1000 }}>
+                onClick={handleGeojson} style={{ position: 'absolute', top:'300px', left: '15px', zIndex: 1000 }}>
                 <img src={geoJsonicon} alt="geoJson" style={{ height: '40px', width: '40px', backgroundColor: 'white' }}></img>
             </div>
 
-
             {/* Circle Tool */}
             <div className='circle-Tool'
-                onSubmit={handleCircleDrawClick}
-                style={{ position: 'absolute', top: '350px', left: '12px', zIndex: 1000 }}>
+                onClick={handleCircleDrawClick}
+                style={{ position: 'absolute', top: '400px', left: '15px', zIndex: 1000 }}>
                 <img src={CircleIcon} alt='Circle' style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
             </div>
 
             <div className='point-tool'
                 onClick={handlePointDrawClick}
-                style={{ position: 'absolute', bottom: '295px', left: '10px', zIndex: 1000 }}>
+                style={{ position: 'absolute', top: '350px', left: '15px', zIndex: 1000 }}>
                 <img src={PointIcon} alt='point' style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
 
             </div>
 
-               {/*
-        
+            {/*
+            /*
             Tool Section Start
-        
-        */}
+            
+            */}
 
             {/* Polylines draw tool */}
             {showPolyLineForm && (
@@ -377,7 +423,7 @@ export default function Map12() {
                                 />
                             </label>
                             <hr />
-                            <button className=' btn btn-outline-success' type="submit" style={{ textAlign: 'center' }}>Submit</button>
+                            <button className=" btn btn-outline-success  btn-sm mx-4 my-1 mg-0" tabIndex={-1} type="submit" style={{ textAlign: 'center' }}>Submit</button>
                         </div>
                         <hr />
                     </form>
@@ -431,11 +477,12 @@ export default function Map12() {
                         <label > GeoJSON Data</label>
                     </div>
                     <div className=" card-polygon-body">
-
-                        <label className='card-polygon-body-text' htmlFor="FileGroup" >File for upload</label>
-
+                        <div className='card-polygon-body-text'>
+                            <label htmlFor="FileGroup" >File for upload</label>
+                        </div>
+                        <hr />
                         <input type="file" className="form-control" id="FileGroup" onChange={handleFileUpload} />
-
+                        <hr />
 
                     </div>
 
@@ -468,7 +515,7 @@ export default function Map12() {
                                         <br />
                                     </label>
                                     <hr />
-                                    <button className='btn btn-outline-success' type="submit" style={{ align: 'center' }}>Submit </button>
+                                    <button className=" btn btn-outline-success  btn-sm mx-4 my-1 mg-0" tabIndex={-1} type="submit" style={{ align: 'center' }}>Submit </button>
                                 </div>
                             </form>
                         </div>
@@ -478,6 +525,7 @@ export default function Map12() {
                                 <div className='card-polygon-title' >
                                     <label > Enter the Lon & Lat</label>
                                 </div>
+                                <hr />
                                 <div className='cardpolygon--body'>
                                     {polygoncoordinates.map((coord, index) => (
                                         <div key={index} >
@@ -508,6 +556,7 @@ export default function Map12() {
 
                                     ))
                                     }
+                                    <br />
                                     <button type="submit" className=" btn btn-outline-success  btn-sm mx-4 my-1 mg-0" tabIndex={-1}>Submit Coordinates</button>
                                 </div>
                             </form>
@@ -527,36 +576,83 @@ export default function Map12() {
                         </div>
                         <div className='card-point-body'>
                             <div className='card-point-text'>
-                            <label > Lon & Lat</label>
+                                <label > Lon & Lat</label>
                             </div>
-                        <label>
-                            <input
-                                type="number"
-                                value={pointCoordinates.lat}
-                                onChange={(e) => setPointCoordinates({ ...pointCoordinates, lat: e.target.value })}
-                                required
-                                placeholder="Latitude"
-                            />
-                        </label>
-                        <br/>
-                        <label>
-                            <input
-                                type="number"
-                                value={pointCoordinates.lon}
-                                onChange={(e) => setPointCoordinates({ ...pointCoordinates, lon: e.target.value })}
-                                required
-                                placeholder="Longitude"
-                            />
-                        </label>
-                        <br/>
-                        <button type="submit">Draw Point</button>
+                            <hr />
+                            <label>
+                                <input
+                                    type="number"
+                                    value={pointCoordinates.lat}
+                                    onChange={(e) => setPointCoordinates({ ...pointCoordinates, lat: e.target.value })}
+                                    required
+                                    placeholder="Latitude"
+                                />
+                            </label>
+                            <br />
+                            <label>
+                                <input
+                                    type="number"
+                                    value={pointCoordinates.lon}
+                                    onChange={(e) => setPointCoordinates({ ...pointCoordinates, lon: e.target.value })}
+                                    required
+                                    placeholder="Longitude"
+                                />
+                            </label>
+                            <hr />
+                            <button className=" btn btn-outline-success  btn-sm mx-4 my-1 mg-0" tabIndex={-1} type="submit">Draw Point</button>
                         </div>
                     </form>
                 </div>
 
             )}
 
-            {/* Navigation Rotation */}
+            {/* Circle Tool */}
+            {showCircleForm && (
+                <div className='card-circle'>
+                    <form onSubmit={handleDrawCircle}>
+                        <div className='card-circle-title'>
+                            <label>Circle Tool</label>
+                        </div>
+                        <div className='card-circle-body'>
+                            <div className='card-circle-text'>
+                                <label> Lon,Lat &Radius </label>
+                            </div>
+                            <hr />
+                            <label>
+                                <input
+                                    type="number"
+                                    value={circleCoordinates.lat}
+                                    onChange={(e) => setCircleCoordinates({ ...circleCoordinates, lat: e.target.value })}
+                                    required
+                                    placeholder="Latitude"
+                                />
+                            </label>
+                            <br />
+                            <label>
+                                <input
+                                    type="number"
+                                    value={circleCoordinates.lon}
+                                    onChange={(e) => setCircleCoordinates({ ...circleCoordinates, lon: e.target.value })}
+                                    required
+                                    placeholder="Longitude"
+                                />
+                            </label>
+                            <br />
+                            <label>
+                                <input
+                                    type="number"
+                                    value={radius}
+                                    onChange={(e) => setRadius(e.target.value)}
+                                    required
+                                    placeholder="Radius (in meters)"
+                                />
+                            </label>
+                        </div>
+                        <hr />
+                        <button className=" btn btn-outline-success  btn-sm mx-4 my-1 mg-0" tabIndex={-1} type="submit">Draw Circle</button>
+                    </form>
+                </div>
+            )}
         </>
     )
 };
