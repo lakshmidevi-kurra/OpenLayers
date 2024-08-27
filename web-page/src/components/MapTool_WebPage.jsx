@@ -5,7 +5,7 @@ import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import './Map12.css'
+import './MapTool_WebPage.css'  
 
 import homeIcon from '../images/home .png'
 // Polylines draw
@@ -32,7 +32,7 @@ import CircleIcon from '../images/circle.png'
 import { Fill, Stroke } from 'ol/style';
 import { Circle as CircleGeom, } from 'ol/geom';
 
-export default function Map12() {
+export default function MapTool_WebPage() {
     const vectorSource = useRef(new VectorSource());
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);

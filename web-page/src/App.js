@@ -1,5 +1,5 @@
 import './App.css';
-import MapContainer from './components/Map12';
+import MapContainer from './components/MapTool_WebPage';
 import NavBar from './components/NavBar/NavBar';
 
 function App() {
