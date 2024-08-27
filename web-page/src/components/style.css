@@ -59,7 +59,8 @@
         cursor: 'pointer';
 
 }
-.polygon-tool{
+
+/*.polygon-tool{
     top: 200px;
     width: 30px; 
     height: 30px;
@@ -72,7 +73,7 @@
     cursor: 'pointer';
 
 }
-
+*/
 .geojson-data{
     top: 250px;
     width: 30px; 

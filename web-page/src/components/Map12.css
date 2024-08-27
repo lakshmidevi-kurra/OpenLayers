@@ -1,0 +1,141 @@
+.linedraw {
+   
+    top: 150px;
+    left: 60px;
+    width: 30px; 
+    height: 30px;
+    border: 2px solid #ece8e8; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    position: absolute;
+    font-size: 24px; 
+    color: #bab7bc;
+    z-index: 1000;
+    cursor: 'pointer';
+
+}
+
+.geojson-data{
+    top: 250px;
+    width: 30px; 
+    height: 30px;
+    border: 2px solid #ece8e8; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    position: absolute;
+    font-size: 24px; 
+    color: #bab7bc;
+    z-index: 1000;
+    cursor: 'pointer';
+
+}
+
+.circle-Tool{
+    top: 300px;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #ece8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    position: absolute;
+    font-size: 24px; 
+    color: #bab7bc;
+    z-index: 1000;
+    cursor: 'pointer';
+
+}
+.point-tool{
+    top:300px;
+    width: 30px;
+    height: 30px;
+    left: 4px;
+    border: 2px solid #ece8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    position: absolute;
+    font-size: 24px; 
+    color: #bab7bc;
+    z-index: 1000;
+    cursor: 'pointer';
+
+
+}
+
+.card-polylines, .card-geojson, .card-polygon, .card-point{
+    height: auto;
+    width: auto;
+    position: absolute;
+    z-index: 1000;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    top: 60px;
+    right: 100px;
+    opacity: .8;
+    border: 1px solid;
+    padding: 0%;
+    padding-bottom: 0%;
+
+
+
+}
+.card-polylines-title, .card-polygon-title, .card-geojson-title, .card-point-title{
+    background-color:burlywood;
+    text-align: center;
+    font-size: larger;
+    font-weight: 600;
+    padding-bottom: 0px;
+    fill: blanchedalmond;
+    height: auto;
+    width: auto;
+    
+
+}
+.card-polylines-text, .card-polygon-text, .card-geojson-text, .card-point-text{
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 500;
+    font-size: medium;
+}
+
+.card-polylines-body,.card-polygon-body, .card-geojson-body, .card-point-body{
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+}
+.card-polylines-draw, .card-polygon-draw{
+    height: auto;
+    width: auto;
+    position: absolute;
+    z-index: 1000;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    top: 250px;
+    right: 1px;
+    opacity: .8;
+    border: 1px solid;
+    padding: 0%;
+    padding-bottom: 0%;
+
+
+}
+/*
+.card-polygon{
+     height: auto;
+    width: auto;
+    position: absolute;
+    z-index: 1000;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    top: 60px;
+    right: 100px;
+    opacity: .8;
+    border: 1px solid;
+    padding: 0%;
+    padding-bottom: 0%;
+
+}
+    */
+    
+
+   
