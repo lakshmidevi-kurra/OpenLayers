@@ -5,7 +5,7 @@ import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import './MapTool_WebPage.css'  
+import './MapTool_WebPage.css'
 
 import homeIcon from '../images/home .png'
 // Polylines draw
@@ -331,8 +331,9 @@ export default function MapTool_WebPage() {
         map.getView().animate({ center: center, zoom: 10, duration: 1000 });
     };
 
+    // Show the point form and hide others
+
     const handleHomeClick = () => {
-        // Show the point form and hide others
         setShowPoliLineForm(false);
         setShowGeojson(false);
         setShowPolygonForm(false);
@@ -351,7 +352,7 @@ export default function MapTool_WebPage() {
             <div
                 className="home"
                 onClick={handleHomeClick}
-                style={{ position: 'absolute', top:'150px', left: '15px', zIndex: 1000 }}
+                style={{ position: 'absolute', top: '150px', left: '15px', zIndex: 1000 }}
             >
                 <img src={homeIcon} alt="Line" style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
             </div>
@@ -361,7 +362,7 @@ export default function MapTool_WebPage() {
             <div
                 className="linedraw"
                 onClick={handlePoliLineDrawClick}
-                style={{ position: 'absolute',  top:' 200px' , left: '15px', zIndex: 1000 }}
+                style={{ position: 'absolute', top: ' 200px', left: '15px', zIndex: 1000 }}
             >
                 <img src={lineIcon} alt="Line" style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
             </div>
@@ -369,13 +370,13 @@ export default function MapTool_WebPage() {
             {/* Polygon Draw section */}
             <div
                 className="polygon-tool"
-                onClick={handlePolygonDrawClick}  style={{ position: 'absolute', top: '250px', left: '15px', zIndex: 1000 }}>
+                onClick={handlePolygonDrawClick} style={{ position: 'absolute', top: '250px', left: '15px', zIndex: 1000 }}>
                 <img src={polygonIcon} alt="Polygon" style={{ height: '40px', width: '40px', backgroundColor: 'white' }} />
             </div>
 
             {/* Geo Json Data section */}
             <div className='geojson-data'
-                onClick={handleGeojson} style={{ position: 'absolute', top:'300px', left: '15px', zIndex: 1000 }}>
+                onClick={handleGeojson} style={{ position: 'absolute', top: '300px', left: '15px', zIndex: 1000 }}>
                 <img src={geoJsonicon} alt="geoJson" style={{ height: '40px', width: '40px', backgroundColor: 'white' }}></img>
             </div>
 
@@ -565,7 +566,7 @@ export default function MapTool_WebPage() {
 
                 </div>
             )}
-
+            {/* point tool */}
             {showPointForm && (
                 <div className='card-point' >
 
