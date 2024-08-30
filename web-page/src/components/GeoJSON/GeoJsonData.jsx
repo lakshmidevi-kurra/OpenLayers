@@ -5,7 +5,8 @@ import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import geoJsonicon from '../src/../../images/geojson.png'
+
+import geoJsonicon from '../src/../../images/database.png'
 import GeoJSON from 'ol/format/GeoJSON';
 
 export default function GeoJsonData() {
