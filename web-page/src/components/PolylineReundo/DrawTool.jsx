@@ -1,3 +1,9 @@
+/**
+ //   Line Draw tool is work 
+ but not Polygon Draw Tool 
+ 
+ */
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
@@ -45,13 +51,12 @@ const DrawTool = () => {
             draw.on('drawstart', (event) => {
                 const feature = event.feature;
                 setCurrentFeature(feature);
-                setUndo([]); // Clear undo stack for new drawing
+                const coordinates=feature.getGeometry().getCoordinates()[0];
+                setCurrentFeature(feature);
+                setUndo([coordinates]); // Clear undo stack for new drawing
                 setReundo([]); // Clear redo stack for new drawing
-
-                feature.getGeometry().on('change', () => {
-                    const coordinates = feature.getGeometry().getCoordinates();
-                    setUndo((prevStack) => [...prevStack, JSON.parse(JSON.stringify(coordinates))]);
-                });
+                
+               
             });
 
             map.addInteraction(draw);
@@ -64,14 +69,12 @@ const DrawTool = () => {
             const geometry = currentFeature.getGeometry();
 
             if (drawingType === 'Polygon') {
-                const coordinates = geometry.getCoordinates();
-                if (coordinates[0].length > 3) { // Ensure there are enough coordinates to undo
-                    const lastCoordinate = coordinates[0].pop();
-                    setReundo((prevStack) => [...prevStack, lastCoordinate]);
-                    geometry.setCoordinates([coordinates[0]]);
-                } else {
-                    vectorSource.current.removeFeature(currentFeature);
-                    setCurrentFeature(null);
+                if (undo.length > 2) { // Keep at least two points to form a valid polygon
+                    const newundo = [...undo];
+                    const lastCoordinate = newundo.pop();
+                    setReundo([lastCoordinate, ...reundo]);
+                    currentFeature.getGeometry().setCoordinates([newundo]);
+                    setUndo(newundo);
                 }
             } else { // 'LineString'
                 const coordinates = geometry.getCoordinates();
@@ -93,11 +96,18 @@ const DrawTool = () => {
             const lastRedo = reundo.pop();
 
             if (drawingType === 'Polygon') {
-                const coordinates = geometry.getCoordinates();
-                coordinates[0].push(lastRedo);
-                setUndo((prevStack) => [...prevStack, JSON.parse(JSON.stringify(coordinates[0]))]);
-                geometry.setCoordinates([coordinates[0]]);
-            } else { // 'LineString'
+                if (reundo.length > 0) {
+                    const nextCoordinate = reundo.shift();
+                    const newundo = [...undo, nextCoordinate];
+        
+                    // Update the geometry of the current feature
+                    currentFeature.getGeometry().setCoordinates([newundo]);
+                    setUndo(newundo);
+                    setReundo(reundo);
+                }
+            }
+            
+            else { // 'LineString'
                 const coordinates = geometry.getCoordinates();
                 coordinates.push(lastRedo);
                 setUndo((prevStack) => [...prevStack, JSON.parse(JSON.stringify(coordinates))]);

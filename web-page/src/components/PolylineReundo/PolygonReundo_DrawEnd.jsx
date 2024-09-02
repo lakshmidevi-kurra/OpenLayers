@@ -1,5 +1,3 @@
-// For Polylines undo and Reundo buttons 
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
@@ -9,14 +7,16 @@ import VectorSource from 'ol/source/Vector';
 import Draw from 'ol/interaction/Draw';
 import 'ol/ol.css';
 
-const PolygonToolUndo = () => {
+
+const PolygonReundo_DrawEnd = () => {
     const mapRef = useRef(null);
     const vectorSource = useRef(new VectorSource());
     const [map, setMap] = useState(null);
     const [drawInteraction, setDrawInteraction] = useState(null);
     const [currentFeature, setCurrentFeature] = useState(null);
-    const [undo, setUndo] = useState([]); // Stack for undo actions
-    const [reundo, setReundo] = useState([]); // Stack for redo actions
+    const [undoStack, setUndoStack] = useState([]); // Stack for undo actions
+    const [redoStack, setRedoStack] = useState([]); // Stack for redo actions
+
 
     useEffect(() => {
         // Initialize the map
@@ -26,77 +26,81 @@ const PolygonToolUndo = () => {
                 new TileLayer({ source: new OSM() }),
                 new VectorLayer({ source: vectorSource.current }),
             ],
-            view: new View({ center: [0, 0], zoom: 2 }),
+            view: new View({
+                center: [0, 0],
+                zoom: 2,
+            }),
         });
 
+
         setMap(map);
+
 
         return () => {
             map.setTarget(null);
         };
     }, []);
 
-    const handleDrawLines = () => {
+
+    const handlePolygonDraw = () => {
         if (map && !drawInteraction) {
-            // Create a new draw interaction
+            // Create a new draw interaction for polygons
             const draw = new Draw({
                 source: vectorSource.current,
                 type: 'Polygon',
             });
 
-            draw.on('drawstart', (event) => {
-                const feature = event.feature;
-                setCurrentFeature(feature);
-                setUndo((prevStack) => [...prevStack, feature]);
-                setReundo([]); 
+
+            draw.on('drawstart', () => {
+                // Clear the stacks when starting a new polygon
+                setUndoStack([]);
+                setRedoStack([]);
             });
 
+
+            draw.on('drawend', (event) => {
+                const feature = event.feature;
+                setCurrentFeature(feature);
+                const coordinates = feature.getGeometry().getCoordinates()[0];
+                // Save all coordinates to the undo stack
+                setUndoStack(coordinates);
+                setRedoStack([]); // Clear the redo stack
+            });
+
+
             map.addInteraction(draw);
-            setDrawInteraction(draw); 
+            setDrawInteraction(draw);
         }
     };
+
 
     const handleUndoAction = () => {
-        if (currentFeature) {
-            const coordinates = currentFeature.getGeometry().getCoordinates();
-            if (coordinates.length > 1) {
-                // Remove the last coordinate
-                const newCoordinates = coordinates.slice(0, -1);
-                currentFeature.getGeometry().setCoordinates(newCoordinates);
+        if (undoStack.length > 2) { // Keep at least two points to form a valid polygon
+            const newUndoStack = [...undoStack];
+            const lastCoordinate = newUndoStack.pop();
+            setRedoStack([lastCoordinate, ...redoStack]);
 
-                // Save state to redo stack
-                setReundo((prevStack) => [...prevStack, { coordinates: coordinates.slice(-1)[0] }]);
 
-                // Save state to undo stack
-                setUndo((prevStack) => {
-                    const updatedStack = [...prevStack];
-                    updatedStack[updatedStack.length - 1] = currentFeature;
-                    return updatedStack;
-                });
-            } else {
-                vectorSource.current.removeFeature(currentFeature);
-                setCurrentFeature(null);
-                setUndo((prevStack) => prevStack.slice(0, -1)); 
-            }
+            // Update the geometry of the current feature
+            currentFeature.getGeometry().setCoordinates([newUndoStack]);
+            setUndoStack(newUndoStack);
         }
     };
+
 
     const handleRedoAction = () => {
-        if (reundo.length > 0 && currentFeature) {
-            const lastRedo = reundo.pop();
-            const coordinates = currentFeature.getGeometry().getCoordinates();
+        if (redoStack.length > 0) {
+            const nextCoordinate = redoStack.shift();
+            const newUndoStack = [...undoStack, nextCoordinate];
 
-            // Add the last removed coordinate
-            const newCoordinates = [...coordinates, lastRedo.coordinates];
-            currentFeature.getGeometry().setCoordinates(newCoordinates);
 
-            // Save state to undo stack
-            setUndo((prevStack) => [...prevStack, currentFeature]);
-
-            // Update redo stack
-            setReundo(reundo);
+            // Update the geometry of the current feature
+            currentFeature.getGeometry().setCoordinates([newUndoStack]);
+            setUndoStack(newUndoStack);
+            setRedoStack(redoStack);
         }
     };
+
 
     return (
         <>
@@ -110,14 +114,14 @@ const PolygonToolUndo = () => {
                     style={{ textAlign: 'center' }}
                     onClick={handleUndoAction}
                 >
-                    Undo 
+                    Undo
                 </button>
                 <button
                     className="btn btn-outline-success btn-sm mx-4 my-1 mg-0"
                     tabIndex={-1}
                     type="button"
                     style={{ textAlign: 'left' }}
-                    onClick={handleDrawLines}
+                    onClick={handlePolygonDraw}
                 >
                     Draw
                 </button>
@@ -128,11 +132,14 @@ const PolygonToolUndo = () => {
                     style={{ textAlign: 'right' }}
                     onClick={handleRedoAction}
                 >
-                    reundo
+                    Redo
                 </button>
             </form>
         </>
     );
 };
 
-export default PolygonToolUndo;
+
+export default PolygonReundo_DrawEnd;
+
+

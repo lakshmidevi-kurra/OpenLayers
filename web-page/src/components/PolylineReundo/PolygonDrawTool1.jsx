@@ -4,6 +4,7 @@ import View from 'ol/View';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import Draw from 'ol/interaction/Draw';
+import { fromLonLat } from 'ol/proj';
 import 'ol/ol.css';
 
 const PolygonDrawTool1 = () => {
@@ -13,10 +14,10 @@ const PolygonDrawTool1 = () => {
     const vectorSource = useRef(new VectorSource({ wrapX: false }));
     const [undoStack, setUndoStack] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
-    const [currentFeature, setCurrentFeature] = useState(null);
+    const [currentPolygon, setCurrentPolygon] = useState(null);
 
     useEffect(() => {
-        // Initialize map
+
         const rasterLayer = new TileLayer({
             source: new OSM(),
         });
@@ -25,19 +26,19 @@ const PolygonDrawTool1 = () => {
             source: vectorSource.current,
         });
 
-        const mapInstance = new Map({
+        const map = new Map({
             target: mapRef.current,
             layers: [rasterLayer, vectorLayer],
             view: new View({
-                center: [0, 0],
+                center: fromLonLat([0, 0]),
                 zoom: 1,
             }),
         });
 
-        setMap(mapInstance);
+        setMap(map);
 
         return () => {
-            mapInstance.setTarget(null); // Clean up the map on component unmount
+            map.setTarget(null); // Clean up the map on component unmount
         };
     }, []);
 
@@ -52,14 +53,13 @@ const PolygonDrawTool1 = () => {
         });
 
         drawInteraction.on('drawstart', (event) => {
-            setCurrentFeature(event.feature);
+            setCurrentPolygon(event.feature);
             setUndoStack([]);
             setRedoStack([]);
         });
 
         drawInteraction.on('drawend', () => {
-            const geometry = currentFeature.getGeometry();
-            setUndoStack([geometry.getCoordinates()]);
+//            setUndoStack([]);
             setRedoStack([]);
         });
 
@@ -68,33 +68,53 @@ const PolygonDrawTool1 = () => {
     };
 
     const handleUndo = () => {
-        if (currentFeature) {
-            const geometry = currentFeature.getGeometry();
+        if (currentPolygon) {
+            const geometry = currentPolygon.getGeometry();
             const coordinates = geometry.getCoordinates()[0];
-
+            
+            // Check if there are more than 3 points to ensure it's a valid polygon
             if (coordinates.length > 1) {
-                const removedPoint = coordinates.pop();
+                const removedPoint =   coordinates.pop();
+               const  [x, y] = removedPoint;
+               const [lon, lat] = fromLonLat([x, y]); // Convert to longitude and latitude
+               console.log(`Removed point: Longitude: ${lon}, Latitude: ${lat}`);
+   
 
-                setRedoStack([...redoStack, removedPoint]); // Push removed point to redo stack
-                setUndoStack([...undoStack, coordinates.slice()]); // Push current state to undo stack
+                setUndoStack([...undoStack, removedPoint]);
 
                 geometry.setCoordinates([coordinates]);
-                currentFeature.setGeometry(geometry);
+                currentPolygon.setGeometry(geometry);
+
+                
+
+                // Clear redo stack since a new undo operation occurred
+                setRedoStack([]);
             }
         }
     };
 
     const handleRedo = () => {
-        if (currentFeature && redoStack.length > 0) {
-            const geometry = currentFeature.getGeometry();
+        if (currentPolygon && undoStack.length > 0) {
+            console.log("reundo ")
+            const geometry = currentPolygon.getGeometry();
             const coordinates = geometry.getCoordinates()[0];
-            const restoredPoint = redoStack.pop();
-
+            const restoredPoint = undoStack.pop();
+            
             coordinates.push(restoredPoint); // Add the restored point back
-            setUndoStack([...undoStack, coordinates.slice()]); // Push current state to undo stack
-
+            const  [x, y] = restoredPoint;
+            const [lon, lat] = fromLonLat([x, y]); // Convert to longitude and latitude
+            console.log(`Restored point: Longitude: ${lon}, Latitude: ${lat}`);
+    
+            // Ensure the coordinates array is valid and doesn't have duplicates
             geometry.setCoordinates([coordinates]);
-            currentFeature.setGeometry(geometry);
+            currentPolygon.setGeometry(geometry);
+            /*
+            vectorSource.current.clear();
+            vectorSource.current.addFeature(currentPolygon);
+            */
+           
+            // Push the restored point onto the redo stack
+            setRedoStack([...redoStack, restoredPoint]);
         }
     };
 
@@ -103,31 +123,28 @@ const PolygonDrawTool1 = () => {
             <div ref={mapRef} style={{ width: '100%', height: '100vh', position: 'absolute' }}></div>
             <form className="drawTool" style={{ position: 'absolute', top: '100px', right: '100px', zIndex: 1000 }}>
                 <label>Polygon</label>
-                <button
-                    onClick={handleDrawPolygon}
+                <button onClick={handleUndo}
                     className="btn btn-outline-success btn-sm mx-4 my-1 mg-0"
                     tabIndex={-1}
                     type="button"
-                    style={{ textAlign: 'right' }}
-                >
-                    Draw
-                </button>
-                <button
-                    onClick={handleUndo}
-                    className="btn btn-outline-success btn-sm mx-4 my-1 mg-0"
-                    tabIndex={-1}
-                    type="button"
-                    style={{ textAlign: 'right' }}
-                >
+                    style={{ textAlign: 'right' }}>
                     Undo
                 </button>
-                <button
-                    onClick={handleRedo}
+
+                <button onClick={handleDrawPolygon}
                     className="btn btn-outline-success btn-sm mx-4 my-1 mg-0"
                     tabIndex={-1}
                     type="button"
-                    style={{ textAlign: 'right' }}
-                >
+                    style={{ textAlign: 'right' }}>
+                    Draw
+                </button>
+               
+
+                <button onClick={handleRedo}
+                    className="btn btn-outline-success btn-sm mx-4 my-1 mg-0"
+                    tabIndex={-1}
+                    type="button"
+                    style={{ textAlign: 'right' }}>
                     Redo
                 </button>
             </form>
