@@ -6,11 +6,11 @@ import { OSM } from 'ol/source';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 // Polylines draw
-import lineIcon from '../src/../../images/line.png';
+import lineIcon from '../../src/../images/drawLine.png';
 import { Feature } from 'ol';
 import { LineString } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
-
+import './PolyLines.css'
 export default function PolyLines() {
 
     const vectorSource = useRef(new VectorSource());
@@ -20,11 +20,9 @@ export default function PolyLines() {
     const viewRef = useRef(null);
 
       // State for controlling visibility of forms
-      const [showPolyLineForm, setShowPoliLineForm] = useState(false);
-
-      // Polyline Draw Tool variables
       const [coordinates, setCoordinates] = useState([]);
-      const [numPoints, setNumPoints] = useState(0);
+    const [numPoints, setNumPoints] = useState(0);
+    const [showPolyLineForm, setShowPoliLineForm] = useState(false);
       useEffect(() => {
         const view = new View({
             center: [0, 0],
@@ -47,16 +45,16 @@ export default function PolyLines() {
 
         viewRef.current = view;
         vectorLayer.current = map.getLayers().item(1); // Get the vector layer
+        console.log(mapRef.current); // Debugging: Check if the map instance is correctly initialized
+
         setMap(map);
 
         return () => map.setTarget(null);
     }, []);
-    
+
     const handlePoliLineDrawClick = () => {
         setShowPoliLineForm(true);
-       // setShowGeojson(false);
-        //setShowPolygonForm(false)
-    };
+         };
 
     const handlePointsSubmit = (e) => {
         e.preventDefault();
@@ -95,12 +93,14 @@ export default function PolyLines() {
         const lineFeature = new Feature({
             geometry: lineString,
         });
-        vectorSource.current.clear();
+        //vectorSource.current.clear();
         vectorSource.current.addFeature(lineFeature);
         mapRef.current.getView().fit(vectorSource.current.getExtent(), {
             duration: 1000,
         });
     };
+    
+
 
   return (
    <>
@@ -117,16 +117,18 @@ export default function PolyLines() {
 
              {/* Polylines draw tool */}
              {showPolyLineForm && (
-                <div className='card' >
+                <div className='card-polylines' >
                     <form onSubmit={handlePointsSubmit}>
-                        <div className='card-title'>
-                            <label>
+                        <div className='card-polylines-title'>
+                            <label style={{ padding: '0px' }}>
                                 Polylines
                             </label>
+                            <hr />
                         </div>
-                        <hr />
-                        <div className='card-body'>
+                        <div className='card-polylines-body'>
                             <label >
+                                Enter the points<br />
+                                <hr />
                                 <input
                                     type="number"
                                     value={numPoints}
@@ -136,18 +138,23 @@ export default function PolyLines() {
                                     placeholder='No of points'
                                 />
                             </label>
+
                             <hr />
-                            <button className=' btn btn-primary' type="submit" style={{ textAlign: 'center' }}>Submit</button>
+                            <button className='btn btn-outline-success  btn-sm mx-4 my-1 mg-0' tabIndex={-1} type='undo' style={{ textAlign:'left'}}>Undo </button>
+                            <button className=" btn btn-outline-success  btn-sm mx-4 my-1 mg-0" tabIndex={-1} type="submit" style={{ textAlign: 'center' }}>Submit</button>
+                            <button className='btn btn-outline-success  btn-sm mx-4 my-1 mg-0' tabIndex={-1} type='Re-undo' style={{ textAlign:'left'}}> Re-undo</button>
                         </div>
                         <hr />
                     </form>
 
                     {coordinates.length > 0 && (
                         <form onSubmit={handleDrawPolyline}>
-                            <div className='card1'>
-                                <div className='card-title'>
+                            <div className="card-polylines-draw">
+                                <div className='card-polylines-title'>
                                     <label>Coordinates </label> </div>
-                                <div className='card-body1'>
+                                <div className='card-polylines-body'>
+                                    <label className='card-polylines-text'> Enter Coordinates </label>
+                                    <hr />
                                     {coordinates.map((coordinate, index) => (
                                         <div key={index}>
                                             <label>
@@ -171,10 +178,10 @@ export default function PolyLines() {
                                                     required
                                                 />
                                             </label>
-                                            <hr />
                                         </div>
                                     ))}
-                                    <button type="submit">Draw Polyline</button>
+                                    <button className=" btn btn-outline-success  btn-sm mx-4 my-1 mg-0" tabIndex={-1} type="submit">Draw Polyline</button>
+
                                 </div>
                             </div>
                         </form>
@@ -182,7 +189,6 @@ export default function PolyLines() {
                 </div>
             )}
 
-   
    </> 
    
 )

@@ -1,10 +1,8 @@
 import './App.css';
-import MapContainer from './components/MapTool_WebPage';
-import NavBar from './components/NavBar/NavBar';
+import MapContainer from './components/PolylineReundo/PolygonToolUndo';
 function App() {
   return (
     <>
-    <NavBar/>
     <MapContainer/>
     </>
   );
